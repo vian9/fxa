@@ -69,7 +69,6 @@ type UnitRowProps = {
   secondaryCtaText?: string;
   secondaryCtaRoute?: string;
   secondaryButtonClassName?: string;
-  secondaryButtonTestId?: string;
   children?: React.ReactNode;
   headerContent?: React.ReactNode;
   actionContent?: React.ReactNode;
@@ -97,7 +96,6 @@ export const UnitRow = ({
   secondaryCtaText,
   secondaryCtaRoute,
   secondaryButtonClassName,
-  secondaryButtonTestId = 'secondary-button',
   revealModal,
   revealSecondaryModal,
   alertBarRevealed,
@@ -131,7 +129,7 @@ export const UnitRow = ({
   }
 
   return (
-    <div className="unit-row">
+    <div className="unit-row" data-testid={formatDataTestId('unit-row')}>
       <div className="unit-row-header">
         <span className="flex justify-between items-center">
           <h3 data-testid={formatDataTestId('unit-row-header')} id={headerId}>
@@ -189,7 +187,7 @@ export const UnitRow = ({
               ctaText={secondaryCtaText}
               className={secondaryButtonClassName}
               alertBarRevealed={alertBarRevealed}
-              prefixDataTestId={secondaryButtonTestId}
+              prefixDataTestId={formatDataTestId('secondary')}
             />
           )}
 
