@@ -27,7 +27,10 @@ const DEVICES_SUPPORT_URL =
 export function sortAndFilterConnectedClients(
   attachedClients: Array<AttachedClient>
 ) {
-  const groupedByName = groupBy(attachedClients, 'name');
+  const groupedByName = groupBy(
+    attachedClients.filter((c) => !!c.name),
+    'name'
+  );
 
   // get a unique (by name) list and sort by time last accessed
   const sortedAndUniqueClients = Object.keys(groupedByName)
@@ -37,15 +40,15 @@ export function sortAndFilterConnectedClients(
           a.lastAccessTime - b.lastAccessTime
       )[0];
     })
-    .sort((a, b) => b.lastAccessTime - a.lastAccessTime);
-
-  // move currently active client to the top
-  sortedAndUniqueClients.forEach((client, i) => {
-    if (client.isCurrentSession) {
-      sortedAndUniqueClients.splice(i, 1);
-      sortedAndUniqueClients.unshift(client);
-    }
-  });
+    .sort((a, b) => {
+      if (a.isCurrentSession) {
+        return -1;
+      }
+      if (b.isCurrentSession) {
+        return 1;
+      }
+      return b.lastAccessTime - a.lastAccessTime;
+    });
 
   return sortedAndUniqueClients;
 }
