@@ -25,6 +25,7 @@ import { Container } from 'typedi';
 import { ConfigType } from '../../config';
 import error from '../error';
 import Redis from '../redis';
+import { subscriptionProductMetadataValidator } from '../routes/validators';
 import { CurrencyHelper } from './currencies';
 
 const CUSTOMER_RESOURCE = 'customers';
@@ -1086,6 +1087,33 @@ export class StripeHelper {
   async removeCustomerFromCache(uid: string, email: string) {}
 
   /**
+   * Fetches all plans that are attached to a product
+   */
+  fetchPlansByProductId(productId: string): Stripe.ApiListPromise<Stripe.Plan> {
+    return this.stripe.plans.list({
+      active: true,
+      product: productId,
+      expand: ['data.product'],
+    });
+  }
+
+  /**
+   * Fetches a product by it's ID
+   */
+  async fetchProductById(productId: string): Promise<AbbrevProduct | null> {
+    let product;
+
+    try {
+      product = await this.stripe.products.retrieve(productId);
+    } catch (err) {
+      this.log.error(`Error retrieving product ${productId}: `, err);
+      return null;
+    }
+
+    return this.abbrevProductFromStripeProduct(product);
+  }
+
+  /**
    * Fetches all plans from stripe and returns them.
    *
    * Use `allPlans` below to use the cached-enhanced version.
@@ -1120,6 +1148,25 @@ export class StripeHelper {
         continue;
       }
 
+      const result = subscriptionProductMetadataValidator.validate({
+        ...item.product.metadata,
+        ...item.metadata,
+      });
+
+      if (result?.error) {
+        const msg = `fetchAllPlans - Plan "${item.id}"'s metadata failed validation`;
+        this.log.error(msg, { error: result.error, plan: item });
+
+        Sentry.withScope((scope) => {
+          scope.setContext('validationError', {
+            error: result.error,
+          });
+          Sentry.captureMessage(msg, Sentry.Severity.Error);
+        });
+
+        continue;
+      }
+
       plans.push({
         amount: item.amount,
         currency: item.currency,
@@ -1150,7 +1197,7 @@ export class StripeHelper {
   }
 
   /**
-   * Find a plan by id or error if its not a valid planId.
+   * Find a plan by id or error if it's not a valid planId.
    */
   async findPlanById(planId: string): Promise<AbbrevPlan> {
     const plans = await this.allPlans();

@@ -8,6 +8,25 @@ const { assert } = require('chai');
 
 const validators = require('../../../lib/routes/validators');
 
+const validProductMetadata = {
+  webIconURL: 'https://example.com/static/icon.svg',
+  upgradeCTA: 'hello <a href="http://example.org">world</a>',
+  downloadURL: 'https://example.com/download',
+  appStoreLink: 'https://example.com/appStoreRedirect',
+  playStoreLink: 'https://example.com/playStoreRedirect',
+  'product:privacyNoticeURL':
+    'https://accounts-static.cdn.mozilla.net/legal/privacy',
+  'product:privacyNoticeDownloadURL':
+    'https://accounts-static.cdn.mozilla.net/legal/privacy.pdf',
+  'product:termsOfServiceURL':
+    'https://accounts-static.cdn.mozilla.net/legal/terms',
+  'product:termsOfServiceDownloadURL':
+    'https://accounts-static.cdn.mozilla.net/legal/terms.pdf',
+  productSet: '123done',
+  productOrder: 2,
+  'capabilities:aFakeClientId12345': 'more,comma,separated,values',
+};
+
 describe('lib/routes/validators:', () => {
   it('isValidEmailAddress returns true for valid email addresses', () => {
     assert.strictEqual(validators.isValidEmailAddress('foo@example.com'), true);
@@ -375,9 +394,15 @@ describe('lib/routes/validators:', () => {
   describe('subscriptionProductMetadataValidator', () => {
     const { subscriptionProductMetadataValidator: subject } = validators;
 
-    it('accepts an empty object', () => {
+    const deletePropAndValidate = (prop) => {
+      const copiedProductMetadata = Object.assign({}, validProductMetadata);
+      delete copiedProductMetadata[prop];
+      return subject.validate(copiedProductMetadata);
+    };
+
+    it('rejects an empty object', () => {
       const res = subject.validate({});
-      assert.ok(!res.error);
+      assert.ok(res.error);
     });
 
     it('rejects a non-object', () => {
@@ -386,17 +411,48 @@ describe('lib/routes/validators:', () => {
     });
 
     it('accepts unexpected keys', () => {
-      const res = subject.validate({
-        'capabilities:8675309': '123done,321done',
-        newThing: 'this is unexpected',
-      });
+      const res = subject.validate(
+        Object.assign({}, validProductMetadata, {
+          'capabilities:8675309': '123done,321done',
+          newThing: 'this is unexpected',
+        })
+      );
       assert.ok(!res.error);
     });
 
     it('rejects expected keys with invalid values', () => {
-      const res = subject.validate({
-        iconURL: true,
-      });
+      const res = subject.validate(
+        Object.assign({}, validProductMetadata, {
+          webIconURL: true,
+        })
+      );
+      assert.ok(res.error);
+    });
+
+    it('rejects if missing required props', () => {
+      let res = deletePropAndValidate('downloadURL');
+      assert.ok(res.error);
+
+      res = deletePropAndValidate('product:privacyNoticeURL');
+      assert.ok(res.error);
+
+      res = deletePropAndValidate('product:privacyNoticeDownloadURL');
+      assert.ok(res.error);
+
+      res = deletePropAndValidate('product:termsOfServiceURL');
+      assert.ok(res.error);
+
+      res = deletePropAndValidate('product:termsOfServiceDownloadURL');
+      assert.ok(res.error);
+    });
+
+    it('rejects if no capabilities set', () => {
+      const res = subject.validate(
+        Object.assign({}, validProductMetadata, {
+          capabilities: null,
+          'capabilities:aFakeClientId12345': null,
+        })
+      );
       assert.ok(res.error);
     });
   });
@@ -425,15 +481,7 @@ describe('lib/routes/validators:', () => {
       const plan = {
         ...basePlan,
         plan_metadata: {},
-        product_metadata: {
-          productSet: '123done',
-          productOrder: 0,
-          iconURL: 'http://example.org',
-          downloadURL: 'http://example.org',
-          upgradeCTA: 'hello <a href="http://example.org">world</a>',
-          newThing: 'this is unexpected',
-          'capabilities:8675309': '123done,321done',
-        },
+        product_metadata: validProductMetadata,
       };
       const res = subject.validate(plan);
       assert.ok(!res.error);
@@ -442,9 +490,9 @@ describe('lib/routes/validators:', () => {
     it('rejects invalid product metadata', () => {
       const plan = {
         ...basePlan,
-        product_metadata: {
-          iconURL: true,
-        },
+        product_metadata: Object.assign({}, validProductMetadata, {
+          webIconURL: true,
+        }),
       };
       const res = subject.validate(plan);
       assert.ok(res.error);
