@@ -100,6 +100,7 @@ export const PageChangePassword = ({}: RouteComponentProps) => {
         logViewEvent(settingsViewName, 'change-password.success');
         alertSuccessAndGoHome();
       } catch (e) {
+        console.error('oops', e);
         const localizedError = l10n.getString(
           `auth-error-${AuthUiErrors.INCORRECT_PASSWORD.errno}`,
           null,
@@ -110,7 +111,7 @@ export const PageChangePassword = ({}: RouteComponentProps) => {
           setCurrentPasswordErrorText(localizedError);
           setValue('oldPassword', '');
         } else {
-          alertBar.error(localizedError);
+          alertBar.error(e.message);
         }
       }
     },

@@ -1,9 +1,7 @@
 import { BasePage } from './base';
 
 export class DisplayNamePage extends BasePage {
-  goto() {
-    return this.page.goto(`${this.baseUrl}/settings/display_name`);
-  }
+  readonly path = 'settings/display_name';
 
   displayName() {
     return this.page.$eval('input[type=text]', (el: any) => el.value);
