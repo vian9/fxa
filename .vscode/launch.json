@@ -5,11 +5,20 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pm2-node",
-      "request": "attach",
-      "name": "Attach via PM2",
-      "service": "${command:PickProcess}"
+      "name": "Launch Program",
+      "program": "${workspaceFolder}/app.js",
+      "request": "launch",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "pwa-node"
     },
+    // {
+    //   "type": "pm2-node",
+    //   "request": "attach",
+    //   "name": "Attach via PM2",
+    //   "service": "${command:PickProcess}"
+    // },
     {
       "name": "Attach to auth",
       "type": "node",
@@ -73,6 +82,20 @@
       "skipFiles": ["<node_internals>/**"],
       "cwd": "${workspaceFolder}",
       "port": 9200
+    },
+    {
+      "name": "Functional Tests",
+      "type": "node",
+      "protocol": "inspector",
+      "env": {
+        "DEBUG": "1"
+      },
+      "program": "${workspaceFolder}/node_modules/folio/cli.js",
+      "args": ["--config=${workspaceFolder}/packages/fxa-settings/fnl/config.ts", "--timeout=0"],
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": true,
+      "cwd":"${workspaceFolder}",
+      "request": "launch",
     }
   ]
 }

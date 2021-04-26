@@ -1,9 +1,7 @@
 import { BasePage } from './base';
 
 export class ChangePasswordPage extends BasePage {
-  goto() {
-    return this.page.goto(`${this.baseUrl}/settings/change_password`);
-  }
+  readonly path = 'settings/change_password';
 
   setCurrentPassword(password: string) {
     return this.page.fill(

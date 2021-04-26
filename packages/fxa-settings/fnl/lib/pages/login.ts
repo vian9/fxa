@@ -1,9 +1,7 @@
 import { BasePage } from './base';
 
 export class LoginPage extends BasePage {
-  goto() {
-    return this.page.goto(`${this.baseUrl}`);
-  }
+  readonly path = '';
 
   async login(email: string, password: string) {
     await this.page.fill('input[type=email]', email);

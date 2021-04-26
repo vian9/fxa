@@ -1,9 +1,7 @@
 import { BasePage } from './base';
 
 export class RecoveryKeyPage extends BasePage {
-  goto() {
-    return this.page.goto(`${this.baseUrl}/settings/account_recovery`);
-  }
+  readonly path = 'settings/account_recovery';
 
   setPassword(password: string) {
     return this.page.fill('input[type=password]', password);

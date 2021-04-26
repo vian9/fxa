@@ -1,27 +1,28 @@
-import { BrowserContext } from 'playwright';
-import {
-  newTestType,
-  PlaywrightEnv,
-  PlaywrightOptions,
-  TestInfo,
-} from '@playwright/test';
-import * as poms from '../pages';
 import { EnvName, create as createEnv } from '../env';
 import { BaseEnv, Credentials } from '../env/base';
 import { EmailClient } from '../env/email';
+import * as poms from '../pages';
+import {
+  FastEnv,
+  TestInfo,
+  PlaywrightOptions,
+  WorkerInfo,
+  newTestType,
+} from './fast';
+import { BrowserContext } from 'playwright';
 
-export class MultiBrowserEnv extends PlaywrightEnv {
+export class MultiBrowserEnv extends FastEnv {
   private readonly env: BaseEnv;
-  private extraContexts: Array<BrowserContext>;
+  private extraContexts: BrowserContext[];
   private credentials: Credentials;
 
   constructor(envName: EnvName, options?: PlaywrightOptions) {
-    super('firefox', options);
+    super(options);
     this.env = createEnv(envName);
     this.extraContexts = [];
   }
-  async beforeAll() {
-    await super.beforeAll();
+  async beforeAll(workerInfo: WorkerInfo) {
+    await super.beforeAll(workerInfo);
   }
 
   async beforeEach(testInfo: TestInfo) {
@@ -34,7 +35,7 @@ export class MultiBrowserEnv extends PlaywrightEnv {
 
     const browsers = [poms.create(result.page, this.env)];
     for (let i = 0; i < extra; i++) {
-      const c = await result.browser.newContext();
+      const c = await this.browser.newContext();
       browsers.push(poms.create(await c.newPage(), this.env));
       this.extraContexts.push(c);
     }
@@ -56,8 +57,8 @@ export class MultiBrowserEnv extends PlaywrightEnv {
     await Promise.all(this.extraContexts.map((c) => c.close()));
   }
 
-  async afterAll() {
-    await super.afterAll();
+  async afterAll(workerInfo: WorkerInfo) {
+    await super.afterAll(workerInfo);
   }
 }
 

@@ -2,9 +2,7 @@ import { BasePage } from './base';
 import { getCode } from '../../../src/lib/totp';
 
 export class TotpPage extends BasePage {
-  goto() {
-    return this.page.goto(`${this.baseUrl}/settings/two_step_authentication`);
-  }
+  readonly path = 'settings/two_step_authentication';
 
   async setSecurityCode() {
     await this.page.click('[data-testid=cant-scan-code]');
