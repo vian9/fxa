@@ -92,6 +92,7 @@ export class TotpRow extends UnitRow {
 
 export class ConnectedServicesRow extends UnitRow {
   async services() {
+    await this.page.waitForSelector('#service');
     const elements = await this.page.$$('#service');
     return elements.map((el) => new ConnectedService(el));
   }

@@ -1,4 +1,5 @@
 import { test, multiTest, expect } from './config';
+import { EmailType } from './lib/env/email';
 
 test('set the display name', async ({ pages: { settings, displayName } }) => {
   await settings.goto();
@@ -9,8 +10,6 @@ test('set the display name', async ({ pages: { settings, displayName } }) => {
   await displayName.submit();
   const newName = await settings.displayName.statusText();
   expect(newName).toEqual('me');
-  const screenshot = await settings.displayName.screenshot();
-  expect(screenshot).toMatchSnapshot('display-name.png');
 });
 
 test('change password', async ({
@@ -55,12 +54,7 @@ test('add and remove totp', async ({ pages: { settings, totp } }) => {
   let status = await settings.totp.statusText();
   expect(status).toEqual('Not set');
   await settings.totp.clickAdd();
-  await totp.setSecurityCode();
-  await totp.submit();
-  const recoveryCode = await totp.getRecoveryCode();
-  await totp.submit();
-  await totp.setRecoveryCode(recoveryCode);
-  await totp.submit();
+  await totp.enable();
   await settings.waitForAlertBar();
   status = await settings.totp.statusText();
   expect(status).toEqual('Enabled');
@@ -68,6 +62,70 @@ test('add and remove totp', async ({ pages: { settings, totp } }) => {
   await settings.clickModalConfirm();
   status = await settings.totp.statusText();
   expect(status).toEqual('Not set');
+});
+
+test('change email and login', async ({
+  credentials,
+  env,
+  pages: { login, settings, secondaryEmail },
+}) => {
+  await settings.goto();
+  await settings.secondaryEmail.clickAdd();
+  const newEmail = credentials.email.replace(/(\w+)/, '$1_secondary');
+  await env.email.clear(newEmail);
+  await secondaryEmail.setEmail(newEmail);
+  await secondaryEmail.submit();
+  const msg = await env.email.waitForEmail(
+    newEmail,
+    EmailType.verifySecondaryCode
+  );
+  const code = msg.headers['x-verify-code'] as string;
+  await secondaryEmail.setVerificationCode(code);
+  await secondaryEmail.submit();
+  await settings.waitForAlertBar();
+  await settings.secondaryEmail.clickMakePrimary();
+  await settings.logout();
+  await login.login(newEmail, credentials.password);
+  credentials.email = newEmail;
+  const primary = await settings.primaryEmail.statusText();
+  expect(primary).toEqual(newEmail);
+});
+
+test('can get new recovery codes via email', async ({
+  env,
+  credentials,
+  page,
+  pages: { login, settings, totp },
+}) => {
+  await settings.goto();
+  await settings.totp.clickAdd();
+  const recoveryCodes = await totp.enable();
+  await settings.logout();
+  for (let i = 0; i < recoveryCodes.length - 3; i++) {
+    await login.login(
+      credentials.email,
+      credentials.password,
+      recoveryCodes[i]
+    );
+    await settings.logout();
+  }
+  await login.login(
+    credentials.email,
+    credentials.password,
+    recoveryCodes[recoveryCodes.length - 1]
+  );
+  const msg = await env.email.waitForEmail(
+    credentials.email,
+    EmailType.lowRecoveryCodes
+  );
+  const link = msg.headers['x-link'] as string;
+  await page.goto(link, { waitUntil: 'networkidle' });
+  const newCodes = await totp.getRecoveryCodes();
+  expect(newCodes.length).toEqual(recoveryCodes.length);
+
+  await settings.goto();
+  await settings.totp.clickDisable();
+  await settings.clickModalConfirm();
 });
 
 multiTest('disconnect RP', async ({ credentials, browsers: [a, b] }) => {

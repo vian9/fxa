@@ -24,11 +24,24 @@ export class TotpPage extends BasePage {
     ]);
   }
 
-  getRecoveryCode() {
-    return this.page.innerText('[data-testid=datablock] span:nth-child(1)');
+  async getRecoveryCodes(): Promise<string[]> {
+    await this.page.waitForSelector('[data-testid=datablock]');
+    return this.page.$$eval('[data-testid=datablock] span', (elements) =>
+      elements.map((el) => (el as HTMLElement).innerText)
+    );
   }
 
   setRecoveryCode(code: string) {
     return this.page.fill('[data-testid=recovery-code-input-field]', code);
+  }
+
+  async enable() {
+    await this.setSecurityCode();
+    await this.submit();
+    const codes = await this.getRecoveryCodes();
+    await this.submit();
+    await this.setRecoveryCode(codes[0]);
+    await this.submit();
+    return codes;
   }
 }
