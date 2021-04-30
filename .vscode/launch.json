@@ -5,20 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/app.js",
-      "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "type": "pwa-node"
+      "type": "pm2-node",
+      "request": "attach",
+      "name": "Attach via PM2",
+      "service": "${command:PickProcess}"
     },
-    // {
-    //   "type": "pm2-node",
-    //   "request": "attach",
-    //   "name": "Attach via PM2",
-    //   "service": "${command:PickProcess}"
-    // },
     {
       "type": "firefox",
       "request": "attach",
