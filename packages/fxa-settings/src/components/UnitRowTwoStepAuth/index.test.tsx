@@ -28,7 +28,7 @@ describe('UnitRowTwoStepAuth', () => {
       screen.getByTestId('two-step-unit-row-header-value').textContent
     ).toContain('Enabled');
     expect(
-      screen.getByTestId('two-step-disable-button-unit-row-modal').textContent
+      screen.getByTestId('two-step-secondary-unit-row-modal').textContent
     ).toContain('Disable');
   });
 
@@ -96,9 +96,7 @@ describe('UnitRowTwoStepAuth', () => {
     );
 
     await act(async () => {
-      fireEvent.click(
-        screen.getByTestId('two-step-disable-button-unit-row-modal')
-      );
+      fireEvent.click(screen.getByTestId('two-step-secondary-unit-row-modal'));
     });
 
     expect(

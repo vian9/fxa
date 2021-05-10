@@ -119,7 +119,7 @@ describe('UnitRow', () => {
       'Change'
     );
     expect(
-      screen.getByTestId('secondary-button-unit-row-modal').textContent
+      screen.getByTestId('secondary-unit-row-modal').textContent
     ).toContain('Disable');
   });
 
