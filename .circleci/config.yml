@@ -261,17 +261,28 @@ jobs:
           path: artifacts/tests
 
   playwright-functional-tests:
-    resource_class: medium
+    resource_class: medium+
     docker:
-      - image: mozilla/fxa-circleci
+      - image: mcr.microsoft.com/playwright:focal
+      - image: redis
+      - image: memcached
+      - image: circleci/mysql:5.7.27
+    environment:
+      NODE_ENV: dev
     steps:
+      - run: apt-get install -y netcat
       - base-install:
           package: fxa-settings
       - run:
           name: Running playwright tests
           command: ./packages/fxa-settings/scripts/playwright-tests.sh
       - store_artifacts:
+          path: ~/.pm2/logs
+          destination: logs
+      - store_artifacts:
           path: artifacts
+      - store_test_results:
+          path: artifacts/tests
 
   build-and-deploy-storybooks:
     resource_class: small

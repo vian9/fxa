@@ -71,22 +71,13 @@ test('change email and login', async ({
 }) => {
   await settings.goto();
   await settings.secondaryEmail.clickAdd();
-  const newEmail = credentials.email.replace(/(\w+)/, '$1_secondary');
-  await env.email.clear(newEmail);
-  await secondaryEmail.setEmail(newEmail);
-  await secondaryEmail.submit();
-  const msg = await env.email.waitForEmail(
-    newEmail,
-    EmailType.verifySecondaryCode
-  );
-  const code = msg.headers['x-verify-code'] as string;
-  await secondaryEmail.setVerificationCode(code);
-  await secondaryEmail.submit();
+  const newEmail = credentials.email.replace(/(\w+)/, '$1_alt');
+  await secondaryEmail.addAndVerify(newEmail);
   await settings.waitForAlertBar();
   await settings.secondaryEmail.clickMakePrimary();
-  await settings.logout();
-  await login.login(newEmail, credentials.password);
   credentials.email = newEmail;
+  await settings.logout();
+  await login.login(credentials.email, credentials.password);
   const primary = await settings.primaryEmail.statusText();
   expect(primary).toEqual(newEmail);
 });

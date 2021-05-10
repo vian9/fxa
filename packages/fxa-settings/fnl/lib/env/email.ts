@@ -1,7 +1,7 @@
 import got from 'got';
 
 function wait() {
-  return new Promise((r) => setTimeout(r, 500));
+  return new Promise((r) => setTimeout(r, 50));
 }
 
 function toUsername(emailAddress: string) {

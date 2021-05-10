@@ -1,9 +1,14 @@
 import { test as multiTest, MultiBrowserEnv } from './lib/presets/multiBrowser';
 import path from 'path';
-import { setConfig, PlaywrightOptions } from './lib/presets/fast';
+import {
+  setConfig,
+  PlaywrightOptions,
+  setReporters,
+  reporters,
+} from './lib/presets/fast';
 import { SingleAccountEnv, test } from './lib/presets/singleAccount';
 
-const timeout = process.env.PWDEBUG ? 0 : 10000;
+const timeout = process.env.PWDEBUG ? 0 : 30000;
 
 setConfig({
   testDir: __dirname,
@@ -11,6 +16,18 @@ setConfig({
   timeout,
   retries: 1,
 });
+
+if (process.env.CI) {
+  setReporters([
+    new reporters.junit({
+      outputFile: path.resolve(
+        __dirname,
+        '../../../artifacts/tests/test-results.xml'
+      ),
+    }),
+    new reporters.list(),
+  ]);
+}
 
 const options: PlaywrightOptions = {
   // devtools: true,

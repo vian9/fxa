@@ -27,7 +27,9 @@ export class UnitRow {
   }
 
   async screenshot() {
-    const el = await this.page.$(`[data-testid=${this.id}-unit-row]`);
+    const el = await this.page.waitForSelector(
+      `[data-testid=${this.id}-unit-row]`
+    );
     return el.screenshot();
   }
 }
