@@ -1,6 +1,7 @@
 import { Page } from 'playwright';
 import { BaseEnv } from '../env/base';
 import { ChangePasswordPage } from './changePassword';
+import { DeleteAccountPage } from './deleteAccount';
 import { DisplayNamePage } from './displayName';
 import { LoginPage } from './login';
 import { RecoveryKeyPage } from './recoveryKey';
@@ -13,6 +14,7 @@ export function create(page: Page, env: BaseEnv) {
   return {
     page,
     changePassword: new ChangePasswordPage(page, env),
+    deleteAccount: new DeleteAccountPage(page, env),
     displayName: new DisplayNamePage(page, env),
     login: new LoginPage(page, env),
     secondaryEmail: new SecondaryEmailPage(page, env),

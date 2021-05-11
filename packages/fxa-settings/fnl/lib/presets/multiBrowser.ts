@@ -50,10 +50,17 @@ export class MultiBrowserEnv extends FastEnv {
   async afterEach(testInfo: TestInfo) {
     await super.afterEach(testInfo);
     await this.env.email.clear(this.credentials.email);
-    await this.env.auth.accountDestroy(
-      this.credentials.email,
-      this.credentials.password
-    );
+    try {
+      await this.env.auth.accountDestroy(
+        this.credentials.email,
+        this.credentials.password
+      );
+    } catch (e) {
+      // a test may delete the account
+      if (e.errno !== 102) {
+        throw e;
+      }
+    }
     await Promise.all(this.extraContexts.map((c) => c.close()));
   }
 

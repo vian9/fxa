@@ -4,15 +4,23 @@ export class LoginPage extends BasePage {
   readonly path = '';
 
   async login(email: string, password: string, recoveryCode?: string) {
-    await this.page.fill('input[type=email]', email);
+    await this.setEmail(email);
     await this.page.click('button[type=submit]');
-    await this.page.fill('input[type=password]', password);
+    await this.setPassword(password);
     await this.submit();
     if (recoveryCode) {
       await this.clickUseRecoveryCode();
       await this.setRecoveryCode(recoveryCode);
       await this.submit();
     }
+  }
+
+  setEmail(email: string) {
+    return this.page.fill('input[type=email]', email);
+  }
+
+  setPassword(password: string) {
+    return this.page.fill('input[type=password]', password);
   }
 
   async clickUseRecoveryCode() {
