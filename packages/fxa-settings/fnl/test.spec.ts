@@ -135,3 +135,23 @@ multiTest('disconnect RP', async ({ credentials, browsers: [a, b] }) => {
   services = await a.settings.connectedServices.services();
   expect(services.length).toEqual(1);
 });
+
+multiTest(
+  'delete account',
+  { browsers: 1 },
+  async ({
+    credentials,
+    browsers: [{ login, settings, deleteAccount, page }],
+  }) => {
+    await login.goto();
+    await login.useCredentials(credentials);
+    await settings.goto();
+    await settings.clickDeleteAccount();
+    await deleteAccount.checkAllBoxes();
+    await deleteAccount.clickContinue();
+    await deleteAccount.setPassword(credentials.password);
+    await deleteAccount.submit();
+    const success = await page.waitForSelector('.success');
+    expect(await success.isVisible()).toBeTruthy();
+  }
+);

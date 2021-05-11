@@ -1,6 +1,7 @@
 import { test as multiTest, MultiBrowserEnv } from './lib/presets/multiBrowser';
 import path from 'path';
 import {
+  expect,
   setConfig,
   PlaywrightOptions,
   setReporters,
@@ -38,7 +39,7 @@ const options: PlaywrightOptions = {
 
 export { test };
 export { multiTest };
-export { expect } from '@playwright/test';
+export { expect };
 
 test.runWith(new SingleAccountEnv('local', options), { tag: 'firefox' });
 multiTest.runWith(new MultiBrowserEnv('local', options));
