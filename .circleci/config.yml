@@ -263,7 +263,7 @@ jobs:
   playwright-functional-tests:
     resource_class: medium+
     docker:
-      - image: mcr.microsoft.com/playwright:focal
+      - image: mcr.microsoft.com/playwright:v1.11.0-focal
       - image: redis
       - image: memcached
       - image: circleci/mysql:5.7.27
