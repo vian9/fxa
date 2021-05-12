@@ -1,5 +1,5 @@
 import { Page } from 'playwright';
-import { BaseEnv } from '../env/base';
+import { BaseEnv } from '../targets/base';
 import { ChangePasswordPage } from './changePassword';
 import { DeleteAccountPage } from './deleteAccount';
 import { DisplayNamePage } from './displayName';

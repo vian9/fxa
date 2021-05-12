@@ -1,5 +1,6 @@
-import { test, multiTest, expect } from './config';
-import { EmailType } from './lib/env/email';
+import { test, expect } from './lib/testTypes/serialTest';
+import { test as multiTest } from './lib/testTypes/multiTest';
+import { EmailType } from './lib/targets/email';
 
 test('set the display name', async ({ pages: { settings, displayName } }) => {
   await settings.goto();
@@ -85,8 +86,7 @@ test('change email and login', async ({
 test('can get new recovery codes via email', async ({
   env,
   credentials,
-  page,
-  pages: { login, settings, totp },
+  pages: { page, login, settings, totp },
 }) => {
   await settings.goto();
   await settings.totp.clickAdd();
@@ -138,7 +138,6 @@ multiTest('disconnect RP', async ({ credentials, browsers: [a, b] }) => {
 
 multiTest(
   'delete account',
-  { browsers: 1 },
   async ({
     credentials,
     browsers: [{ login, settings, deleteAccount, page }],

@@ -1,45 +1,59 @@
-import { test as multiTest, MultiBrowserEnv } from './lib/presets/multiBrowser';
+import * as folio from 'folio';
 import path from 'path';
-import {
-  expect,
-  setConfig,
-  PlaywrightOptions,
-  setReporters,
-  reporters,
-} from './lib/presets/fast';
-import { SingleAccountEnv, test } from './lib/presets/singleAccount';
+import { EnvName } from './lib/targets';
 
-const timeout = process.env.PWDEBUG ? 0 : 30000;
+const target =
+  (folio.registerCLIOption(
+    'target',
+    'Target server environment: local | stage | production'
+  ).value as EnvName) || 'local';
+let debug =
+  folio.registerCLIOption('debug', 'Run with the Playwright Inspector', {
+    type: 'boolean',
+  }).value || !!process.env.PWDEBUG;
 
-setConfig({
-  testDir: __dirname,
-  outputDir: path.resolve(__dirname, '../../../artifacts/functional'),
-  timeout,
-  retries: 1,
-});
-
-if (process.env.CI) {
-  setReporters([
-    new reporters.junit({
-      outputFile: path.resolve(
-        __dirname,
-        '../../../artifacts/tests/test-results.xml'
-      ),
-    }),
-    new reporters.list(),
-  ]);
+if (debug) {
+  process.env.PWDEBUG = '1';
 }
+// The DEBUG env is used to debug without the playwright inspector, like in vscode
+debug = debug || !!process.env.DEBUG;
 
-const options: PlaywrightOptions = {
-  // devtools: true,
-  headless: !process.env.DEBUG,
-  // slowMo: 1000,
-  viewport: { width: 1280, height: 720 },
+const config: folio.Config = {
+  outputDir: path.resolve(__dirname, '../../../artifacts/functional'),
+  timeout: debug ? 0 : 30000,
+  retries: debug ? 0 : 1,
+  reporter: process.env.CI
+    ? [
+        'dot',
+        {
+          name: 'junit',
+          outputFile: path.resolve(
+            __dirname,
+            '../../../artifacts/tests/test-results.xml'
+          ),
+        },
+      ]
+    : 'list',
+  projects: [
+    {
+      name: target,
+      testDir: __dirname,
+      options: {
+        args: debug ? ['-start-debugger-server'] : undefined,
+        firefoxUserPrefs: debug
+          ? {
+              'devtools.debugger.remote-enabled': true,
+              'devtools.chrome.enabled': true,
+              'devtools.debugger.prompt-connection': false,
+            }
+          : undefined,
+        envName: target,
+        headless: !debug,
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+  ],
+  workers: debug ? 1 : undefined,
 };
 
-export { test };
-export { multiTest };
-export { expect };
-
-test.runWith(new SingleAccountEnv('local', options), { tag: 'firefox' });
-multiTest.runWith(new MultiBrowserEnv('local', options));
+export default config;

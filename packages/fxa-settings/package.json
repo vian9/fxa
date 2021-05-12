@@ -99,7 +99,7 @@
     "eslint-plugin-fxa": "^2.0.2",
     "eslint-plugin-jest": "^24.3.6",
     "eslint-plugin-react": "^7.23.2",
-    "folio": "0.3.23-alpha",
+    "folio": "0.4.0-alpha11",
     "fxa-shared": "workspace:*",
     "got": "^11.8.2",
     "mutationobserver-shim": "^0.3.7",

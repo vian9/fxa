@@ -8,7 +8,7 @@ executors:
       - image: redis
       - image: memcached
       - image: pafortin/goaws
-      - image: circleci/mysql:5.7.27
+      - image: circleci/mysql:5.7.31
       - image: mozilla/fxa-email-service
         environment:
           NODE_ENV: dev
@@ -89,7 +89,7 @@ jobs:
       - image: redis
       - image: memcached
       - image: pafortin/goaws
-      - image: circleci/mysql:5.7.27
+      - image: circleci/mysql:5.7.31
     parameters:
       package:
         type: string
@@ -109,7 +109,7 @@ jobs:
     resource_class: medium+
     docker:
       - image: circleci/node:14
-      - image: circleci/mysql:5.7.27
+      - image: circleci/mysql:5.7.31
       - image: jdlk7/firestore-emulator
       - image: memcached
       - image: redis
@@ -191,7 +191,7 @@ jobs:
     resource_class: large
     docker:
       - image: circleci/rust:latest-node
-      - image: mysql:5.7.27
+      - image: mysql:5.7.31
         environment:
           - MYSQL_DATABASE: fxa
           - MYSQL_ALLOW_EMPTY_PASSWORD: yes
@@ -266,7 +266,7 @@ jobs:
       - image: mcr.microsoft.com/playwright:v1.11.0-focal
       - image: redis
       - image: memcached
-      - image: circleci/mysql:5.7.27
+      - image: circleci/mysql:5.7.31
     environment:
       NODE_ENV: dev
     steps:

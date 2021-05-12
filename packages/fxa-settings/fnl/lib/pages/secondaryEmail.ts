@@ -1,4 +1,4 @@
-import { EmailType } from '../env/email';
+import { EmailType } from '../targets/email';
 import { BasePage } from './base';
 
 export class SecondaryEmailPage extends BasePage {

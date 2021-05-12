@@ -1,25 +1,25 @@
-import { EnvName, create as creatEnv } from '../env';
-import { BaseEnv, Credentials } from '../env/base';
-import { EmailClient } from '../env/email';
+import * as folio from 'folio';
+import { BaseEnv, PlaywrightOptions } from './baseEnv';
+import { ServerEnv, Credentials } from '../targets';
+import { EmailClient } from '../targets/email';
 import * as poms from '../pages';
-import {
-  FastEnv,
-  newTestType,
-  PlaywrightOptions,
-  TestInfo,
-  WorkerInfo,
-} from './fast';
+import { EnvName, create as createEnv } from '../targets';
 
-export class SingleAccountEnv extends FastEnv {
-  private readonly env: BaseEnv;
+type SerialOptions = {
+  envName: EnvName;
+} & PlaywrightOptions;
+
+export class SerialEnv extends BaseEnv {
+  private env: ServerEnv;
   private credentials: Credentials;
 
-  constructor(envName: EnvName, options?: PlaywrightOptions) {
-    super(options);
-    this.env = creatEnv(envName);
+  hasBeforeAllOptions(options: SerialOptions) {
+    return 'envName' in options;
   }
-  async beforeAll(workerInfo: WorkerInfo) {
-    await super.beforeAll(workerInfo);
+
+  async beforeAll(options: SerialOptions, workerInfo: folio.WorkerInfo) {
+    await super.beforeAll(options, workerInfo);
+    this.env = createEnv(options.envName);
     const email = EmailClient.emailFromTestTitle(
       `test_worker_${workerInfo.workerIndex}`
     );
@@ -61,23 +61,22 @@ export class SingleAccountEnv extends FastEnv {
     });
   }
 
-  async beforeEach(testInfo: TestInfo) {
-    const result = await super.beforeEach(testInfo);
-    const pages = poms.create(result.page, this.env);
+  async beforeEach({}, testInfo: folio.TestInfo) {
+    await super.beforeEach({}, testInfo);
+    const pages = poms.create(this.page, this.env);
     return {
       env: this.env,
       credentials: this.credentials,
       pages,
-      ...result,
     };
   }
 
-  async afterEach(testInfo: TestInfo) {
-    await super.afterEach(testInfo);
+  async afterEach({}, testInfo: folio.TestInfo) {
+    await this.page.goto('about:blank');
   }
 
-  async afterAll(workerInfo: WorkerInfo) {
-    await super.afterAll(workerInfo);
+  async afterAll({}, workerInfo: folio.WorkerInfo) {
+    await super.afterAll({}, workerInfo);
     await this.env.email.clear(this.credentials.email);
     await this.env.auth.accountDestroy(
       this.credentials.email,
@@ -86,8 +85,5 @@ export class SingleAccountEnv extends FastEnv {
   }
 }
 
-export const test = newTestType<{
-  env: BaseEnv;
-  credentials: Credentials;
-  pages: ReturnType<typeof poms['create']>;
-}>();
+export const test = folio.test.extend(new SerialEnv());
+export { expect } from 'folio';

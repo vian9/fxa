@@ -14,3 +14,6 @@ export type EnvName = keyof typeof environments;
 export function create(name: EnvName): BaseEnv {
   return new environments[name]();
 }
+
+export { BaseEnv as ServerEnv };
+export { Credentials } from './base';

@@ -1,6 +1,5 @@
 import AuthClient from 'fxa-auth-client';
 import { EmailClient } from './email';
-import { EnvName } from './index';
 
 type Resolved<T> = T extends PromiseLike<infer U> ? U : T;
 export type Credentials = Resolved<ReturnType<AuthClient['signUp']>> & {
@@ -11,7 +10,6 @@ export type Credentials = Resolved<ReturnType<AuthClient['signUp']>> & {
 export abstract class BaseEnv {
   readonly auth: AuthClient;
   readonly email: EmailClient;
-  abstract readonly name: EnvName;
   abstract readonly contentServerUrl: string;
   abstract readonly relierUrl: string;
 

@@ -1,5 +1,5 @@
 import { Page } from 'playwright';
-import { BaseEnv } from '../env/base';
+import { BaseEnv } from '../targets/base';
 
 export abstract class BasePage {
   readonly path?: string;

@@ -20,6 +20,6 @@ export class LocalEnv extends BaseEnv {
       email,
       password,
       ...result,
-    };
+    } as Credentials;
   }
 }
