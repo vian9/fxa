@@ -510,22 +510,12 @@ module.exports = function (log, error) {
   var SESSION_DEVICE = 'CALL sessionWithDevice_18(?)';
 
   MySql.prototype.sessionToken = function (id) {
-    return this.readAllResults(SESSION_DEVICE, [id])
-      .then((rows) =>
-        dbUtil.aggregateNameValuePairs(
-          rows,
-          'deviceId',
-          'deviceCommandName',
-          'deviceCommandData',
-          'deviceAvailableCommands'
-        )
-      )
-      .then((results) => {
-        if (results.length === 0) {
-          throw error.notFound();
-        }
-        return results[0];
-      });
+    return this.readAllResults(SESSION_DEVICE, [id]).then((results) => {
+      if (results.length === 0) {
+        throw error.notFound();
+      }
+      return results[0];
+    });
   };
 
   // Select : sessionTokens t, devices d
