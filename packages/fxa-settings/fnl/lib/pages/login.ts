@@ -1,3 +1,4 @@
+import { EmailType } from '../targets/email';
 import { BasePage } from './base';
 
 export class LoginPage extends BasePage {
@@ -10,7 +11,7 @@ export class LoginPage extends BasePage {
     await this.submit();
     if (recoveryCode) {
       await this.clickUseRecoveryCode();
-      await this.setRecoveryCode(recoveryCode);
+      await this.setCode(recoveryCode);
       await this.submit();
     }
   }
@@ -27,8 +28,15 @@ export class LoginPage extends BasePage {
     return this.page.click('#use-recovery-code-link');
   }
 
-  async setRecoveryCode(code: string) {
+  async setCode(code: string) {
     return this.page.fill('input[type=text]', code);
+  }
+
+  async unblock(email: string) {
+    const msg = await this.env.email.waitForEmail(email, EmailType.unblockCode);
+    const code = msg.headers['x-unblock-code'];
+    await this.setCode(code);
+    await this.submit();
   }
 
   async submit() {
@@ -38,7 +46,8 @@ export class LoginPage extends BasePage {
     ]);
   }
 
-  useCredentials(credentials: any) {
+  async useCredentials(credentials: any) {
+    await this.goto();
     return this.page.evaluate((creds) => {
       localStorage.setItem(
         '__fxa_storage.accounts',

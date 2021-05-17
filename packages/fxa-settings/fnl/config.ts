@@ -18,13 +18,16 @@ if (debug) {
 // The DEBUG env is used to debug without the playwright inspector, like in vscode
 debug = debug || !!process.env.DEBUG;
 
+const ci = !!process.env.CI;
+
 const config: folio.Config = {
   outputDir: path.resolve(__dirname, '../../../artifacts/functional'),
-  timeout: debug ? 0 : 30000,
+  timeout: debug ? 0 : 20000,
   retries: debug ? 0 : 1,
-  reporter: process.env.CI
+  forbidOnly: ci,
+  reporter: ci
     ? [
-        'dot',
+        'list',
         {
           name: 'junit',
           outputFile: path.resolve(
@@ -53,7 +56,7 @@ const config: folio.Config = {
       },
     },
   ],
-  workers: debug ? 1 : undefined,
+  workers: debug || ci ? 1 : undefined,
 };
 
 export default config;

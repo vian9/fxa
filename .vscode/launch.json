@@ -27,6 +27,10 @@
       "autoAttachChildProcesses": true,
       "cwd":"${workspaceFolder}",
       "request": "launch",
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/folio/**/*.js",
+        "<node_internals>/**/*.js"
+      ]
     }
   ]
 }

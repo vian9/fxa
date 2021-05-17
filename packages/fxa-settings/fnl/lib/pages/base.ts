@@ -10,8 +10,12 @@ export abstract class BasePage {
     return this.env.baseUrl;
   }
 
+  get url() {
+    return `${this.baseUrl}/${this.path}`;
+  }
+
   goto() {
-    return this.page.goto(`${this.baseUrl}/${this.path}`);
+    return this.page.goto(this.url);
   }
 
   alertBarText() {

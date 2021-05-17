@@ -17833,9 +17833,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"folio@npm:0.4.0-alpha11":
-  version: 0.4.0-alpha11
-  resolution: "folio@npm:0.4.0-alpha11"
+"folio@npm:0.4.0-alpha13":
+  version: 0.4.0-alpha13
+  resolution: "folio@npm:0.4.0-alpha13"
   dependencies:
     "@babel/code-frame": ^7.12.13
     "@babel/core": ^7.14.0
@@ -17870,7 +17870,7 @@ __metadata:
     stack-utils: ^2.0.2
   bin:
     folio: cli.js
-  checksum: 0ab1b27abfc944fbacacb0a2bd0aac10ffdb28adf2f1ec4cef55c05bf048cbc4f0cb171bf927c02628d264a5cb9c640085acee87632ed5cc09314f85ee980a11
+  checksum: f6abf75eee7c0b83bc38828516f5cabf4b634880a42e70a5d683534776c90feae231bd81bc49706c7aa3e6ef76f310285b0003a64636d67dd0fb010f042dc21b
   languageName: node
   linkType: hard
 
@@ -19483,7 +19483,7 @@ fsevents@~2.1.1:
     eslint-plugin-fxa: ^2.0.2
     eslint-plugin-jest: ^24.1.3
     eslint-plugin-react: ^7.22.0
-    folio: 0.4.0-alpha11
+    folio: 0.4.0-alpha13
     fxa-auth-client: "workspace:*"
     fxa-common-password-list: ^0.0.4
     fxa-react: "workspace:*"

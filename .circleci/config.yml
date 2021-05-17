@@ -271,8 +271,20 @@ jobs:
       NODE_ENV: dev
     steps:
       - run: apt-get install -y netcat
-      - base-install:
-          package: fxa-settings
+      - checkout
+      - restore_cache:
+          keys:
+            # prefer the exact hash
+            - fxa-yarn-cache-pw-{{ checksum "yarn.lock" }}
+            # any cache to start with is better than nothing
+            - fxa-yarn-cache-pw-
+      - run: ./.circleci/base-install.sh fxa-settings
+      - save_cache:
+          key: fxa-yarn-cache-pw-{{ checksum "yarn.lock" }}
+          paths:
+            - .yarn/cache
+            - .yarn/build-state.yml
+            - .yarn/install-state.gz
       - run:
           name: Running playwright tests
           command: ./packages/fxa-settings/scripts/playwright-tests.sh
