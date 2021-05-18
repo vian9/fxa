@@ -32,7 +32,13 @@ export class MultiEnv extends BaseEnv {
     const password = 'asdzxcasd';
     await this.env.email.clear(email);
     this.extraContexts = [];
-    this.credentials = await this.env.createAccount(email, password);
+    try {
+      this.credentials = await this.env.createAccount(email, password);
+    } catch (e) {
+      console.error(e);
+      await this.env.auth.accountDestroy(email, password);
+      this.credentials = await this.env.createAccount(email, password);
+    }
 
     const browsers = [poms.create(this.page, this.env)];
     for (let i = 0; i < extra; i++) {

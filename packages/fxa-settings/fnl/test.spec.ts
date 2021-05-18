@@ -189,39 +189,36 @@ basicTest(
   }
 );
 
-test.describe('more', () => {
-  // test.useOptions({ browsers: 1 })
-  test('delete account', async ({
-    credentials,
-    browsers: [{ login, settings, deleteAccount, page }],
-  }) => {
-    await login.useCredentials(credentials);
-    await settings.goto();
-    await settings.clickDeleteAccount();
-    await deleteAccount.checkAllBoxes();
-    await deleteAccount.clickContinue();
-    await deleteAccount.setPassword(credentials.password);
-    await deleteAccount.submit();
-    const success = await page.waitForSelector('.success');
-    expect(await success.isVisible()).toBeTruthy();
-  });
+test('delete account', async ({
+  credentials,
+  browsers: [{ login, settings, deleteAccount, page }],
+}) => {
+  await login.useCredentials(credentials);
+  await settings.goto();
+  await settings.clickDeleteAccount();
+  await deleteAccount.checkAllBoxes();
+  await deleteAccount.clickContinue();
+  await deleteAccount.setPassword(credentials.password);
+  await deleteAccount.submit();
+  const success = await page.waitForSelector('.success');
+  expect(await success.isVisible()).toBeTruthy();
+});
 
-  test('change email and unblock', async ({
-    credentials,
-    browsers: [{ page, login, settings, secondaryEmail }],
-  }) => {
-    await login.useCredentials(credentials);
-    await settings.goto();
-    await settings.secondaryEmail.clickAdd();
-    const newEmail = `blocked${Math.floor(Math.random() * 100)}@restmail.net`;
-    await secondaryEmail.addAndVerify(newEmail);
-    await settings.secondaryEmail.clickMakePrimary();
-    credentials.email = newEmail;
-    await settings.logout();
-    await login.login(credentials.email, credentials.password);
-    await login.unblock(newEmail);
-    expect(page.url()).toBe(settings.url);
-  });
+test('change email and unblock', async ({
+  credentials,
+  browsers: [{ page, login, settings, secondaryEmail }],
+}) => {
+  await login.useCredentials(credentials);
+  await settings.goto();
+  await settings.secondaryEmail.clickAdd();
+  const newEmail = `blocked${Math.floor(Math.random() * 100)}@restmail.net`;
+  await secondaryEmail.addAndVerify(newEmail);
+  await settings.secondaryEmail.clickMakePrimary();
+  credentials.email = newEmail;
+  await settings.logout();
+  await login.login(credentials.email, credentials.password);
+  await login.unblock(newEmail);
+  expect(page.url()).toBe(settings.url);
 });
 
 test('disconnect RP', async ({ credentials, browsers: [a, b] }) => {
@@ -239,4 +236,21 @@ test('disconnect RP', async ({ credentials, browsers: [a, b] }) => {
   await a.settings.waitForAlertBar();
   services = await a.settings.connectedServices.services();
   expect(services.length).toEqual(1);
+});
+
+test('prompt=consent', async ({
+  credentials,
+  browsers: [{ page, relier, login }],
+}) => {
+  await relier.goto();
+  await relier.clickEmailFirst();
+  await login.login(credentials.email, credentials.password);
+  expect(await relier.isLoggedIn()).toBe(true);
+  await relier.logout();
+  await relier.goto('prompt=consent');
+  await relier.clickEmailFirst();
+  await login.submit();
+  expect(page.url()).toMatch(/signin_permissions/);
+  await login.submit();
+  expect(await relier.isLoggedIn()).toBe(true);
 });
