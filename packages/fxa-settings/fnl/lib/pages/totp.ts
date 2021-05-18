@@ -10,7 +10,8 @@ export class TotpPage extends BasePage {
       await this.page.innerText('[data-testid=manual-code]')
     ).replace(/\s/g, '');
     const code = await getCode(secret);
-    return this.page.fill('input[type=text]', code);
+    await this.page.fill('input[type=text]', code);
+    return secret;
   }
 
   submit() {
@@ -36,12 +37,15 @@ export class TotpPage extends BasePage {
   }
 
   async enable() {
-    await this.setSecurityCode();
+    const secret = await this.setSecurityCode();
     await this.submit();
-    const codes = await this.getRecoveryCodes();
+    const recoveryCodes = await this.getRecoveryCodes();
     await this.submit();
-    await this.setRecoveryCode(codes[0]);
+    await this.setRecoveryCode(recoveryCodes[0]);
     await this.submit();
-    return codes;
+    return {
+      secret,
+      recoveryCodes,
+    };
   }
 }

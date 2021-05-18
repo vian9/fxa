@@ -71,11 +71,11 @@ basicTest(
     await login.clickForgotPassword();
     await login.setEmail(credentials.email);
     await login.submit();
-    const msg = await env.email.waitForEmail(
+    const link = await env.email.waitForEmail(
       credentials.email,
-      EmailType.recovery
+      EmailType.recovery,
+      'x-link'
     );
-    const link = msg.headers['x-link'];
     await page.goto(link, { waitUntil: 'networkidle' });
     await login.setRecoveryKey(key);
     await login.submit();
@@ -105,6 +105,22 @@ basicTest('add and remove totp', async ({ pages: { settings, totp } }) => {
 });
 
 basicTest(
+  'add TOTP and login',
+  async ({ credentials, pages: { page, login, settings, totp } }) => {
+    await settings.goto();
+    await settings.totp.clickAdd();
+    const { secret } = await totp.enable();
+    await settings.logout();
+    await login.login(credentials.email, credentials.password);
+    await login.setTotp(secret);
+    const status = await settings.totp.statusText();
+    expect(status).toEqual('Enabled');
+    await settings.totp.clickDisable();
+    await settings.clickModalConfirm();
+  }
+);
+
+basicTest(
   'change email and login',
   async ({ credentials, env, pages: { login, settings, secondaryEmail } }) => {
     await settings.goto();
@@ -126,7 +142,7 @@ basicTest(
   async ({ env, credentials, pages: { page, login, settings, totp } }) => {
     await settings.goto();
     await settings.totp.clickAdd();
-    const recoveryCodes = await totp.enable();
+    const { recoveryCodes } = await totp.enable();
     await settings.logout();
     for (let i = 0; i < recoveryCodes.length - 3; i++) {
       await login.login(
@@ -141,11 +157,11 @@ basicTest(
       credentials.password,
       recoveryCodes[recoveryCodes.length - 1]
     );
-    const msg = await env.email.waitForEmail(
+    const link = await env.email.waitForEmail(
       credentials.email,
-      EmailType.lowRecoveryCodes
+      EmailType.lowRecoveryCodes,
+      'x-link'
     );
-    const link = msg.headers['x-link'] as string;
     await page.goto(link, { waitUntil: 'networkidle' });
     const newCodes = await totp.getRecoveryCodes();
     expect(newCodes.length).toEqual(recoveryCodes.length);
@@ -156,19 +172,22 @@ basicTest(
   }
 );
 
-basicTest('mocha tests', async ({ env, pages: { page } }, info) => {
-  basicTest.skip(info.project.name !== 'local');
-  basicTest.slow();
-  await page.goto(`${env.contentServerUrl}/tests/index.html`, {
-    waitUntil: 'networkidle',
-  });
-  await page.evaluate(() =>
-    globalThis.runner.on('end', () => (globalThis.done = true))
-  );
-  await page.waitForFunction(() => globalThis.done, {}, { timeout: 0 });
-  const failures = await page.evaluate(() => globalThis.runner.failures);
-  expect(failures).toBe(0);
-});
+basicTest(
+  'content-server mocha tests',
+  async ({ env, pages: { page } }, info) => {
+    basicTest.skip(info.project.name !== 'local');
+    basicTest.slow();
+    await page.goto(`${env.contentServerUrl}/tests/index.html`, {
+      waitUntil: 'networkidle',
+    });
+    await page.evaluate(() =>
+      globalThis.runner.on('end', () => (globalThis.done = true))
+    );
+    await page.waitForFunction(() => globalThis.done, {}, { timeout: 0 });
+    const failures = await page.evaluate(() => globalThis.runner.failures);
+    expect(failures).toBe(0);
+  }
+);
 
 test.describe('more', () => {
   // test.useOptions({ browsers: 1 })

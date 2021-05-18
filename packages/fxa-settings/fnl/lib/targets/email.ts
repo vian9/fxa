@@ -67,6 +67,7 @@ export class EmailClient {
   async waitForEmail(
     emailAddress: string,
     type: EmailType,
+    header?: string,
     timeout: number = 15000
   ) {
     const expires = Date.now() + timeout;
@@ -78,7 +79,7 @@ export class EmailClient {
         (m) => m.headers['x-template-name'] === EmailType[type]
       );
       if (msg) {
-        return msg;
+        return header ? msg.headers[header] : msg;
       }
       await wait();
     }

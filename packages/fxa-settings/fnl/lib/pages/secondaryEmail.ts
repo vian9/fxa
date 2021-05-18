@@ -23,11 +23,11 @@ export class SecondaryEmailPage extends BasePage {
     await this.env.email.clear(email);
     await this.setEmail(email);
     await this.submit();
-    const msg = await this.env.email.waitForEmail(
+    const code = await this.env.email.waitForEmail(
       email,
-      EmailType.verifySecondaryCode
+      EmailType.verifySecondaryCode,
+      'x-verify-code'
     );
-    const code = msg.headers['x-verify-code'] as string;
     await this.setVerificationCode(code);
     await this.submit();
     return code;

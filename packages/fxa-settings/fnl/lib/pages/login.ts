@@ -1,5 +1,6 @@
 import { EmailType } from '../targets/email';
 import { BasePage } from './base';
+import { getCode } from '../../../src/lib/totp';
 
 export class LoginPage extends BasePage {
   readonly path = '';
@@ -33,8 +34,11 @@ export class LoginPage extends BasePage {
   }
 
   async unblock(email: string) {
-    const msg = await this.env.email.waitForEmail(email, EmailType.unblockCode);
-    const code = msg.headers['x-unblock-code'];
+    const code = await this.env.email.waitForEmail(
+      email,
+      EmailType.unblockCode,
+      'x-unblock-code'
+    );
     await this.setCode(code);
     await this.submit();
   }
@@ -60,6 +64,12 @@ export class LoginPage extends BasePage {
   async setNewPassword(password: string) {
     await this.page.fill('#password', password);
     await this.page.fill('#vpassword', password);
+    await this.submit();
+  }
+
+  async setTotp(secret: string) {
+    const code = await getCode(secret);
+    await this.page.fill('input[type=number]', code);
     await this.submit();
   }
 
