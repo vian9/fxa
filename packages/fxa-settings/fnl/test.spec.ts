@@ -53,6 +53,42 @@ basicTest(
   }
 );
 
+basicTest(
+  'use recovery key',
+  async ({
+    credentials,
+    env,
+    pages: { page, login, recoveryKey, settings },
+  }) => {
+    await settings.goto();
+    await settings.recoveryKey.clickCreate();
+    await recoveryKey.setPassword(credentials.password);
+    await recoveryKey.submit();
+    const key = await recoveryKey.getKey();
+    await settings.logout();
+    await login.setEmail(credentials.email);
+    await login.submit();
+    await login.clickForgotPassword();
+    await login.setEmail(credentials.email);
+    await login.submit();
+    const msg = await env.email.waitForEmail(
+      credentials.email,
+      EmailType.recovery
+    );
+    const link = msg.headers['x-link'];
+    await page.goto(link, { waitUntil: 'networkidle' });
+    await login.setRecoveryKey(key);
+    await login.submit();
+    credentials.password = credentials.password + '_new';
+    await login.setNewPassword(credentials.password);
+    await settings.waitForAlertBar();
+    await settings.logout();
+    await login.login(credentials.email, credentials.password);
+    const status = await settings.recoveryKey.statusText();
+    expect(status).toEqual('Not set');
+  }
+);
+
 basicTest('add and remove totp', async ({ pages: { settings, totp } }) => {
   await settings.goto();
   let status = await settings.totp.statusText();

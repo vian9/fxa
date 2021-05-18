@@ -27,7 +27,7 @@ const config: folio.Config = {
   forbidOnly: ci,
   reporter: ci
     ? [
-        'list',
+        'dot',
         {
           name: 'junit',
           outputFile: path.resolve(

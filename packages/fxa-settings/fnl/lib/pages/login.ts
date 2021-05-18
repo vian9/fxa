@@ -46,6 +46,23 @@ export class LoginPage extends BasePage {
     ]);
   }
 
+  async clickForgotPassword() {
+    return Promise.all([
+      this.page.click('a[href="/reset_password"]'),
+      this.page.waitForNavigation({ waitUntil: 'networkidle' }),
+    ]);
+  }
+
+  setRecoveryKey(key: string) {
+    return this.page.fill('input[type=text]', key);
+  }
+
+  async setNewPassword(password: string) {
+    await this.page.fill('#password', password);
+    await this.page.fill('#vpassword', password);
+    await this.submit();
+  }
+
   async useCredentials(credentials: any) {
     await this.goto();
     return this.page.evaluate((creds) => {
