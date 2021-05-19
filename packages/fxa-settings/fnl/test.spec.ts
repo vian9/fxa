@@ -3,16 +3,18 @@ import { test } from './lib/testTypes/multiTest';
 import { EmailType } from './lib/targets/email';
 
 basicTest(
-  'set the display name',
+  'set/unset the display name',
   async ({ pages: { settings, displayName } }) => {
     await settings.goto();
-    const name = await settings.displayName.statusText();
-    expect(name).toEqual('None');
+    expect(await settings.displayName.statusText()).toEqual('None');
     await settings.displayName.clickAdd();
     await displayName.setDisplayName('me');
     await displayName.submit();
-    const newName = await settings.displayName.statusText();
-    expect(newName).toEqual('me');
+    expect(await settings.displayName.statusText()).toEqual('me');
+    await settings.displayName.clickAdd();
+    await displayName.setDisplayName('');
+    await displayName.submit();
+    expect(await settings.displayName.statusText()).toEqual('None');
   }
 );
 
@@ -169,6 +171,21 @@ basicTest(
     await settings.goto();
     await settings.totp.clickDisable();
     await settings.clickModalConfirm();
+  }
+);
+
+basicTest(
+  'subscribe and login to product',
+  async ({ pages: { page, relier, login, subscribe } }) => {
+    await relier.goto();
+    await relier.clickSubscribe();
+    await subscribe.setFullName();
+    await subscribe.setCreditCardInfo();
+    await subscribe.submit();
+    await relier.goto();
+    await relier.clickEmailFirst();
+    await login.submit();
+    expect(await relier.isPro()).toBe(true);
   }
 );
 

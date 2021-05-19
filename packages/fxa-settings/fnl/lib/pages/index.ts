@@ -8,6 +8,7 @@ import { RecoveryKeyPage } from './recoveryKey';
 import { RelierPage } from './relier';
 import { SecondaryEmailPage } from './secondaryEmail';
 import { SettingsPage } from './settings';
+import { SubscribePage } from './subscribe';
 import { TotpPage } from './totp';
 
 export function create(page: Page, env: BaseEnv) {
@@ -19,6 +20,7 @@ export function create(page: Page, env: BaseEnv) {
     login: new LoginPage(page, env),
     secondaryEmail: new SecondaryEmailPage(page, env),
     settings: new SettingsPage(page, env),
+    subscribe: new SubscribePage(page, env),
     recoveryKey: new RecoveryKeyPage(page, env),
     relier: new RelierPage(page, env),
     totp: new TotpPage(page, env),

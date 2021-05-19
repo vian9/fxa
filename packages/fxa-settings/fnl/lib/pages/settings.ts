@@ -61,4 +61,11 @@ export class SettingsPage extends BasePage {
   clickDeleteAccount() {
     return this.page.click('[data-testid=settings-delete-account]');
   }
+
+  clickPaidSubscriptions() {
+    return Promise.all([
+      this.page.click('[data-testid=nav-link-subscriptions]'),
+      this.page.waitForNavigation({ waitUntil: 'networkidle' }),
+    ]);
+  }
 }

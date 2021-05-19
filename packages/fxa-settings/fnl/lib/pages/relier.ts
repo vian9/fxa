@@ -10,6 +10,10 @@ export class RelierPage extends BasePage {
     return this.page.isVisible('#loggedin', { timeout: 1000 });
   }
 
+  isPro() {
+    return this.page.isVisible('.pro-status', { timeout: 1000 });
+  }
+
   async logout() {
     await Promise.all([
       this.page.click('#logout'),
@@ -21,6 +25,13 @@ export class RelierPage extends BasePage {
     return Promise.all([
       this.page.click('button.email-first-button'),
       this.page.waitForNavigation(),
+    ]);
+  }
+
+  async clickSubscribe() {
+    await Promise.all([
+      this.page.click('a[data-currency=usd]'),
+      this.page.waitForNavigation({ waitUntil: 'networkidle' }),
     ]);
   }
 }
