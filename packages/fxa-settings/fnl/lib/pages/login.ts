@@ -1,4 +1,4 @@
-import { EmailType } from '../targets/email';
+import { EmailHeader, EmailType } from '../targets/email';
 import { BasePage } from './base';
 import { getCode } from '../../../src/lib/totp';
 
@@ -37,7 +37,7 @@ export class LoginPage extends BasePage {
     const code = await this.env.email.waitForEmail(
       email,
       EmailType.unblockCode,
-      'x-unblock-code'
+      EmailHeader.unblockCode
     );
     await this.setCode(code);
     await this.submit();

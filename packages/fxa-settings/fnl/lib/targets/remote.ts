@@ -1,5 +1,5 @@
 import { BaseEnv, Credentials } from './base';
-import { EmailType } from './email';
+import { EmailHeader, EmailType } from './email';
 
 export abstract class RemoteEnv extends BaseEnv {
   async createAccount(email: string, password: string): Promise<Credentials> {
@@ -7,7 +7,7 @@ export abstract class RemoteEnv extends BaseEnv {
     const code = await this.email.waitForEmail(
       email,
       EmailType.verify,
-      'x-verify-code'
+      EmailHeader.verifyCode
     );
     await this.auth.verifyCode(creds.uid, code);
     await this.email.clear(email);

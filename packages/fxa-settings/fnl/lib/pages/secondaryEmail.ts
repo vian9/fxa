@@ -1,4 +1,4 @@
-import { EmailType } from '../targets/email';
+import { EmailHeader, EmailType } from '../targets/email';
 import { BasePage } from './base';
 
 export class SecondaryEmailPage extends BasePage {
@@ -26,7 +26,7 @@ export class SecondaryEmailPage extends BasePage {
     const code = await this.env.email.waitForEmail(
       email,
       EmailType.verifySecondaryCode,
-      'x-verify-code'
+      EmailHeader.verifyCode
     );
     await this.setVerificationCode(code);
     await this.submit();

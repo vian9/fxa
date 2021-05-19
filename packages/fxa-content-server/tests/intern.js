@@ -20,6 +20,7 @@ const testsPairing = require('./functional_pairing');
 const testsServer = require('./tests_server');
 const testsServerResources = require('./tests_server_resources');
 const testsSettings = require('./functional_settings');
+const testsShootout = require('./functional_shootout');
 
 const fxaAuthRoot = args.fxaAuthRoot || 'http://localhost:9000/v1';
 const fxaContentRoot = args.fxaContentRoot || 'http://localhost:3030/';
@@ -125,6 +126,9 @@ if (args.suites) {
       break;
     case 'settings':
       config.functionalSuites = testsSettings;
+      break;
+    case 'shootout':
+      config.functionalSuites = testsShootout;
       break;
     case 'all':
       config.functionalSuites = testsMain;

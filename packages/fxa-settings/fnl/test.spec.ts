@@ -1,6 +1,6 @@
 import { test as basicTest, expect } from './lib/testTypes/serialTest';
 import { test } from './lib/testTypes/multiTest';
-import { EmailType } from './lib/targets/email';
+import { EmailHeader, EmailType } from './lib/targets/email';
 
 basicTest(
   'set/unset the display name',
@@ -76,7 +76,7 @@ basicTest(
     const link = await env.email.waitForEmail(
       credentials.email,
       EmailType.recovery,
-      'x-link'
+      EmailHeader.link
     );
     await page.goto(link, { waitUntil: 'networkidle' });
     await login.setRecoveryKey(key);
@@ -162,7 +162,7 @@ basicTest(
     const link = await env.email.waitForEmail(
       credentials.email,
       EmailType.lowRecoveryCodes,
-      'x-link'
+      EmailHeader.link
     );
     await page.goto(link, { waitUntil: 'networkidle' });
     const newCodes = await totp.getRecoveryCodes();
@@ -177,6 +177,7 @@ basicTest(
 basicTest(
   'subscribe and login to product',
   async ({ pages: { page, relier, login, subscribe } }) => {
+    basicTest.slow();
     await relier.goto();
     await relier.clickSubscribe();
     await subscribe.setFullName();

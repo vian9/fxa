@@ -54,6 +54,19 @@ export enum EmailType {
   cadReminderSecond,
 }
 
+export enum EmailHeader {
+  verifyCode = 'x-verify-code',
+  shortCode = 'x-verify-short-code',
+  unblockCode = 'x-unblock-code',
+  signinCode = 'x-signin-verify-code',
+  recoveryCode = 'x-recovery-code',
+  uid = 'x-uid',
+  serviceId = 'x-service-id',
+  link = 'x-link',
+  templateName = 'x-template-name',
+  templateVersion = 'x-template-version',
+}
+
 export class EmailClient {
   static emailFromTestTitle(title: string) {
     return `${title
@@ -67,7 +80,7 @@ export class EmailClient {
   async waitForEmail(
     emailAddress: string,
     type: EmailType,
-    header?: string,
+    header?: EmailHeader,
     timeout: number = 15000
   ) {
     const expires = Date.now() + timeout;
@@ -76,7 +89,7 @@ export class EmailClient {
         `${this.host}/mail/${toUsername(emailAddress)}`
       ).json()) as any[];
       const msg = mail.find(
-        (m) => m.headers['x-template-name'] === EmailType[type]
+        (m) => m.headers[EmailHeader.templateName] === EmailType[type]
       );
       if (msg) {
         return header ? msg.headers[header] : msg;

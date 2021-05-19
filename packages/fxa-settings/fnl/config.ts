@@ -23,7 +23,7 @@ const ci = !!process.env.CI;
 const config: folio.Config = {
   outputDir: path.resolve(__dirname, '../../../artifacts/functional'),
   timeout: debug ? 0 : 20000,
-  retries: debug ? 0 : 1,
+  retries: debug ? 0 : 0, //TODO: set to 1 after shootout
   forbidOnly: ci,
   reporter: ci
     ? [
