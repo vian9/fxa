@@ -28,4 +28,4 @@ _scripts/check-url.sh localhost:3030/settings/static/js/bundle.js
 
 npx pm2 ls
 
-yarn workspace fxa-settings fnl
+time (yarn workspace fxa-settings fnl)

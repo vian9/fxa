@@ -87,39 +87,5 @@ registerSuite('delete_account', {
           .then(click(selectors.ENTER_EMAIL.SUBMIT))
       );
     },
-
-    'sign in, cancel delete account': function () {
-      return (
-        this.remote
-          .then(openPage(ENTER_EMAIL_URL, selectors.ENTER_EMAIL.HEADER))
-          .then(fillOutEmailFirstSignIn(email, PASSWORD))
-
-          // Go to delete account screen
-          .then(click(selectors.SETTINGS_DELETE_ACCOUNT.DELETE_ACCOUNT_BUTTON))
-          .then(testElementExists(selectors.SETTINGS_DELETE_ACCOUNT.DETAILS))
-
-          // Intern won't click on checkboxes with SVGs on top. So click the
-          // checkbox labels instead :-\
-          .findAllByCssSelector(selectors.SETTINGS_DELETE_ACCOUNT.CHECKBOXES)
-          .then((labels) => labels.map((label) => label.click()))
-          .end()
-          .then(click(selectors.SETTINGS.DELETE_ACCOUNT.SUBMIT_BUTTON))
-          // Enter password, but first, click the label to get it out of the way.
-          .then(
-            testElementExists(
-              selectors.SETTINGS.DELETE_ACCOUNT.INPUT_PASSWORD_LABEL
-            )
-          )
-          .then(click(selectors.SETTINGS.DELETE_ACCOUNT.INPUT_PASSWORD_LABEL))
-          .then(
-            type(selectors.SETTINGS_DELETE_ACCOUNT.INPUT_PASSWORD, PASSWORD)
-          )
-          .then(click(selectors.SETTINGS.DELETE_ACCOUNT.CANCEL_BUTTON))
-          .then(pollUntilHiddenByQSA(selectors.SETTINGS_DELETE_ACCOUNT.DETAILS))
-          .then(
-            testElementTextInclude(selectors.SETTINGS.PROFILE_HEADER, email)
-          )
-      );
-    },
   },
 });

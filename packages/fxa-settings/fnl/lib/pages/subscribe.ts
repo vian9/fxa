@@ -6,12 +6,11 @@ export class SubscribePage extends BasePage {
   }
 
   async setCreditCardInfo() {
-    const frames = this.page.frames();
-    const f = frames[frames.length - 1];
-    await f.fill('.InputElement[name=cardnumber]', '4242424242424242');
-    await f.fill('.InputElement[name=exp-date]', '555');
-    await f.fill('.InputElement[name=cvc]', '333');
-    await f.fill('.InputElement[name=postal]', '66666');
+    const frame = this.page.frame({ url: /elements-inner-card/ });
+    await frame.fill('.InputElement[name=cardnumber]', '4242424242424242');
+    await frame.fill('.InputElement[name=exp-date]', '555');
+    await frame.fill('.InputElement[name=cvc]', '333');
+    await frame.fill('.InputElement[name=postal]', '66666');
     await this.page.check('input[type=checkbox]');
   }
 

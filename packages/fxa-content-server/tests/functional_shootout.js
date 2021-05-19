@@ -8,7 +8,6 @@ module.exports = [
   'tests/functional/settings/connected_services_oauth_clients.js',
   'tests/functional/settings/delete_account.js',
   'tests/functional/settings/display_name.js',
-  'tests/functional/settings/external_links.js',
   'tests/functional/settings/recovery_key.js',
   'tests/functional/settings/secondary_email.js',
   'tests/functional/settings/two_step_auth.js',

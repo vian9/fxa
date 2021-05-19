@@ -43,4 +43,4 @@ cd packages/fxa-content-server
 mozinstall /firefox.tar.bz2
 ./firefox/firefox -v
 
-node tests/intern.js --suites='shootout' --output='../../artifacts/tests/test-results.xml'
+time (node tests/intern.js --suites='shootout' --output='../../artifacts/tests/test-results.xml')
