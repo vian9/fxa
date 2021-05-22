@@ -72,6 +72,7 @@ export class SerialEnv extends BaseEnv {
   }
 
   async afterEach({}, testInfo: folio.TestInfo) {
+    await super.afterEach({}, testInfo);
     await this.page.goto('about:blank');
   }
 

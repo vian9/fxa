@@ -2,6 +2,33 @@ import fs from 'fs/promises';
 import * as folio from 'folio';
 import playwright from 'playwright';
 
+class PWLogger implements playwright.Logger {
+  private lines: string[] = [];
+
+  isEnabled(
+    name: string,
+    severity: 'verbose' | 'info' | 'warning' | 'error'
+  ): boolean {
+    return true;
+  }
+
+  log(
+    name: string,
+    severity: 'verbose' | 'info' | 'warning' | 'error',
+    message: string | Error,
+    args: Object[],
+    hints: { color?: string }
+  ): void {
+    this.lines.push(message.toString());
+  }
+
+  reset() {
+    const log = this.lines.join('\r\n');
+    this.lines = [];
+    return log;
+  }
+}
+
 export type PlaywrightOptions = playwright.LaunchOptions &
   playwright.BrowserContextOptions;
 
@@ -12,6 +39,7 @@ export abstract class BaseEnv {
   protected storageState?: playwright.BrowserContextOptions['storageState'];
   protected page: playwright.Page;
   private consoleLogs: string[] = [];
+  private logger: PWLogger;
 
   hasBeforeAllOptions(options: PlaywrightOptions) {
     return true;
@@ -19,9 +47,11 @@ export abstract class BaseEnv {
 
   async beforeAll(options: PlaywrightOptions, workerInfo: folio.WorkerInfo) {
     this.options = options || {};
+    this.logger = new PWLogger();
     this.browser = await playwright.firefox.launch({
       ...options,
       handleSIGINT: false,
+      logger: this.logger,
     });
   }
 
@@ -49,8 +79,6 @@ export abstract class BaseEnv {
     }
     if (!this.page) {
       this.page = await this.context.newPage();
-    }
-    if (testInfo.retry) {
       this.page.on('console', async (msg) => {
         let str = msg.text();
         if (str.includes('JSHandle')) {
@@ -67,12 +95,15 @@ export abstract class BaseEnv {
   }
 
   async afterEach({}, testInfo: folio.TestInfo) {
-    if (
-      testInfo.status !== testInfo.expectedStatus &&
-      this.consoleLogs.length > 0
-    ) {
-      const filename = testInfo.outputPath('console.log');
-      await fs.writeFile(filename, this.consoleLogs.join('\r\n'));
+    const logs = this.logger.reset();
+    if (testInfo.status !== testInfo.expectedStatus) {
+      if (this.consoleLogs.length > 0) {
+        await fs.writeFile(
+          testInfo.outputPath('console.log'),
+          this.consoleLogs.join('\r\n')
+        );
+      }
+      await fs.writeFile(testInfo.outputPath('pw.log'), logs);
     }
     this.consoleLogs = [];
   }

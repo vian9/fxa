@@ -54,6 +54,7 @@ export class MultiEnv extends BaseEnv {
   }
 
   async afterEach({}, testInfo: folio.TestInfo) {
+    await super.afterEach({}, testInfo);
     if (this.page) {
       await this.page.close();
     }
