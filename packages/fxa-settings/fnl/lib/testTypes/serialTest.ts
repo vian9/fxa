@@ -59,6 +59,10 @@ export class SerialEnv extends BaseEnv {
       storageState: this.storageState,
       ...this.options,
     });
+    return {
+      context: this.context,
+      env: this.env,
+    };
   }
 
   async beforeEach({}, testInfo: folio.TestInfo) {
