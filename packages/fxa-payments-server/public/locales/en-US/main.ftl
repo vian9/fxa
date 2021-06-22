@@ -362,3 +362,13 @@ payment-confirmation-amount-year = { $intervalCount ->
 
 payment-confirmation-download-button = Continue to download
 payment-confirmation-cc-card-ending-in = Card ending in { $last4 }
+
+## new user email form
+new-user-sign-in-link = Already have a Firefox account? <a>Sign in</a>
+new-user-email =
+  .placeholder = foxy@mozilla.com
+  .label = Enter your email
+new-user-confirm-email =
+  .label = Confirm your email
+new-user-subscribe-product-updates = I'd like to receive product updates from Firefox
+new-user-subscribe-product-assurance = We only use your email to create your account. We will never sell it to a third party.
